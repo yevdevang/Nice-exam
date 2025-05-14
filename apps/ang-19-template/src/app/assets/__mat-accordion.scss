@@ -1,0 +1,13 @@
+@use '@angular/material' as mat;
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+:root {
+  @include mat.expansion-overrides((
+    container-background-color: #add8e6,
+    container-text-color: #000000,
+  ));
+}
+
+.mat-expansion-panel{
+  //margin-block-end: 2rem !important;
+}

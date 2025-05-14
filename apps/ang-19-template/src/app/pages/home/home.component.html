@@ -1,0 +1,14 @@
+@if (loading()) {
+<div class="flex justify-center items-center h-screen">
+  <mat-spinner diameter="30"></mat-spinner>
+</div>
+} @else if (error()) {
+<div class="flex justify-center items-center h-screen text-red-500">
+  {{ error() }}
+</div>
+} @else if (decodedQuestions().length > 0) {
+
+<div class="card flex justify-center">
+  <app-swiper [results]="decodedQuestions()"></app-swiper>
+</div>
+}
