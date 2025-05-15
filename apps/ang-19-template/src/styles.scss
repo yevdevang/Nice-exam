@@ -18,5 +18,43 @@ body {
 
 .p-carousel-content,
 .p-carousel-indicator-list {
-  width: 50% !important;
+  width: 74% !important;
+}
+
+.p-button {
+  min-height: 70px;
+  color: white !important;
+}
+
+.correct {
+  background-color: green;
+
+  .p-button {
+    .p-button-label {
+      color: white !important;
+    }
+  }
+}
+
+.incorrect {
+  background-color: red;
+
+  .p-button {
+    .p-button-label {
+      color: white !important;
+    }
+  }
+}
+
+.p-carousel-indicator-button {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+}
+
+.p-carousel-indicator-active {
+  .p-carousel-indicator-button {
+    background-color: rgb(59 130 246) !important;
+    border-radius: 50% !important;
+  }
 }

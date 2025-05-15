@@ -1,4 +1,6 @@
 <p-carousel
+  (onPage)="onPageChange()"
+  [autoplayInterval]="timerDuration"
   [circular]="false"
   [numScroll]="1"
   [numVisible]="1"
@@ -6,19 +8,38 @@
   [showNavigators]="false"
   [value]="results"
 >
-  <ng-template #item let-question>
-    <div class="p-4">
+  <ng-template #item let-i="index" let-question>
+    <div class="p-4 h-80">
       <div class="mb-4 text-xl font-medium text-black">
         {{ question.question }}
       </div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="mb-4 text-lg font-medium text-blue-600">
+        Time left: {{ timeLeft() }} seconds
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-black">
         <p-button
+          (click)="handleAnswer(question, answer)"
           *ngFor="let answer of getAllAnswers(question)"
+          [disabled]="question.disabled"
           [label]="answer"
           [outlined]="true"
-          styleClass="w-full"
+          class="bg-blue-500 hover:bg-blue-600 transition duration-300 rounded shadow-md"
+          styleClass="w-full "
         />
       </div>
     </div>
   </ng-template>
 </p-carousel>
+
+<div *ngIf="isSelected" class="flex message justify-center">
+  <p
+    *ngIf="isCorrect(); else incorrect"
+    class="text-green-600 font-bold text-lg"
+  >
+    You're right!
+  </p>
+
+  <ng-template #incorrect>
+    <p class="text-red-500 font-bold text-lg">Sorry, that's not correct.</p>
+  </ng-template>
+</div>
