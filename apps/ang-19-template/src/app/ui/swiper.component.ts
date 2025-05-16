@@ -22,6 +22,12 @@ interface DecodedQuestion {
   disabled?: boolean;
 }
 
+interface ResponsiveOptions {
+  breakpoint: string;
+  numVisible: number;
+  numScroll: number;
+}
+
 @Component({
   selector: 'app-swiper',
   imports: [CommonModule, Carousel, Button],
@@ -38,6 +44,7 @@ export class SwiperComponent implements OnDestroy {
   timeLeft = signal(20);
   timerDuration = TIMER_DURATION;
   carousel = viewChild(Carousel);
+  responsiveOptions: Array<ResponsiveOptions> = [];
   private randomizedAnswers = new Map<string, string[]>();
   #timerSubscription?: Subscription;
 
@@ -54,6 +61,31 @@ export class SwiperComponent implements OnDestroy {
   @Input() set results(value: DecodedQuestion[]) {
     this._results = value;
     this.initializeRandomizedAnswers();
+  }
+
+  ngOnInit() {
+    this.responsiveOptions = [
+      {
+        breakpoint: '1400px',
+        numVisible: 2,
+        numScroll: 1,
+      },
+      {
+        breakpoint: '1199px',
+        numVisible: 3,
+        numScroll: 1,
+      },
+      {
+        breakpoint: '767px',
+        numVisible: 2,
+        numScroll: 1,
+      },
+      {
+        breakpoint: '575px',
+        numVisible: 1,
+        numScroll: 1,
+      },
+    ];
   }
 
   startTimer() {
@@ -96,7 +128,7 @@ export class SwiperComponent implements OnDestroy {
     setTimeout(() => {
       this.carousel()!.page = currentPage! + 1;
       this.getAnswer(question, answer);
-      this.#timerSubscription?.unsubscribe();
+      this.startTimer();
     }, 1000);
   }
 
