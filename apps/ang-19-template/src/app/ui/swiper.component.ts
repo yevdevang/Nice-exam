@@ -5,6 +5,7 @@ import {
   Input,
   OnDestroy,
   signal,
+  viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Carousel } from 'primeng/carousel';
@@ -32,15 +33,27 @@ interface DecodedQuestion {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SwiperComponent implements OnDestroy {
-  @Input() results: DecodedQuestion[] = [];
   isCorrect = signal(false);
   isSelected = false;
   timeLeft = signal(20);
   timerDuration = TIMER_DURATION;
+  carousel = viewChild(Carousel);
+  private randomizedAnswers = new Map<string, string[]>();
   #timerSubscription?: Subscription;
 
   constructor() {
     this.startTimer();
+  }
+
+  private _results: DecodedQuestion[] = [];
+
+  get results(): DecodedQuestion[] {
+    return this._results;
+  }
+
+  @Input() set results(value: DecodedQuestion[]) {
+    this._results = value;
+    this.initializeRandomizedAnswers();
   }
 
   startTimer() {
@@ -60,7 +73,17 @@ export class SwiperComponent implements OnDestroy {
   }
 
   getAllAnswers(question: DecodedQuestion): string[] {
-    return [question.correctAnswer, ...question.incorrectAnswers];
+    return this.randomizedAnswers.get(question.question) || [];
+  }
+
+  insertCorrectAnswerAtRandomIndex(
+    correctAnswer: string,
+    incorrectAnswers: string[],
+  ): string[] {
+    const answers = [...incorrectAnswers];
+    const randomIndex = Math.floor(Math.random() * (answers.length + 1));
+    answers.splice(randomIndex, 0, correctAnswer);
+    return answers;
   }
 
   handleAnswer(question: DecodedQuestion, answer: string) {
@@ -69,8 +92,12 @@ export class SwiperComponent implements OnDestroy {
     question.selectedAnswer = answer;
     question.disabled = true;
     this.isSelected = true;
-    this.getAnswer(question, answer);
-    this.#timerSubscription?.unsubscribe();
+    const currentPage = this.carousel()?.page;
+    setTimeout(() => {
+      this.carousel()!.page = currentPage! + 1;
+      this.getAnswer(question, answer);
+      this.#timerSubscription?.unsubscribe();
+    }, 1000);
   }
 
   getAnswer(question: DecodedQuestion, answer: string) {
@@ -90,5 +117,16 @@ export class SwiperComponent implements OnDestroy {
     this.isCorrect.set(false);
     this.isSelected = false;
     this.startTimer();
+  }
+
+  private initializeRandomizedAnswers() {
+    this.randomizedAnswers.clear();
+    this._results.forEach((question) => {
+      const allAnswers = this.insertCorrectAnswerAtRandomIndex(
+        question.correctAnswer,
+        question.incorrectAnswers,
+      );
+      this.randomizedAnswers.set(question.question, allAnswers);
+    });
   }
 }
